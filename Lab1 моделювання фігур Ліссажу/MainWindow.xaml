@@ -1,0 +1,164 @@
+<Window x:Class="Lab1_Lissajous.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Лабораторна робота №1 — Фігури Ліссажу"
+        Width="1250"
+        Height="800"
+        MinWidth="1050"
+        MinHeight="700"
+        Background="#F4F6F8">
+
+    <Window.DataContext>
+        <local:MainViewModel xmlns:local="clr-namespace:Lab1_Lissajous.ViewModels"/>
+    </Window.DataContext>
+
+    <Grid Margin="18">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="919*"/>
+            <ColumnDefinition Width="295*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Text="Лабораторна робота №1 — Візуальне моделювання фігур Ліссажу"
+                   FontSize="24"
+                   FontWeight="Bold"
+                   Margin="0,0,0,16" Grid.ColumnSpan="2"/>
+
+        <Grid Grid.Row="1" Grid.ColumnSpan="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="300"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0"
+                    Background="White"
+                    CornerRadius="10"
+                    Padding="18"
+                    Margin="0,0,14,0">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
+                        <TextBlock Text="Параметри"
+                                   FontSize="20"
+                                   FontWeight="Bold"
+                                   Margin="0,0,0,15"/>
+
+                        <TextBlock Text="Амплітуда Ax"/>
+                        <TextBox Text="{Binding Ax, UpdateSourceTrigger=PropertyChanged}"
+                                 Margin="0,5,0,10"/>
+
+                        <TextBlock Text="Амплітуда Ay"/>
+                        <TextBox Text="{Binding Ay, UpdateSourceTrigger=PropertyChanged}"
+                                 Margin="0,5,0,10"/>
+
+                        <TextBlock Text="Частота fx, Гц"/>
+                        <TextBox Text="{Binding Fx, UpdateSourceTrigger=PropertyChanged}"
+                                 Margin="0,5,0,10"/>
+
+                        <TextBlock Text="Частота fy, Гц"/>
+                        <TextBox Text="{Binding Fy, UpdateSourceTrigger=PropertyChanged}"
+                                 Margin="0,5,0,10"/>
+
+                        <TextBlock Text="Фаза φx, градуси"/>
+                        <TextBox Text="{Binding PhaseX, UpdateSourceTrigger=PropertyChanged}"
+                                 Margin="0,5,0,10"/>
+
+                        <TextBlock Text="Фаза φy, градуси"/>
+                        <TextBox Text="{Binding PhaseY, UpdateSourceTrigger=PropertyChanged}"
+                                 Margin="0,5,0,5"/>
+
+                        <Slider Minimum="0"
+                                Maximum="360"
+                                Value="{Binding PhaseY, UpdateSourceTrigger=PropertyChanged}"
+                                Margin="0,0,0,2"/>
+                        <TextBlock Text="{Binding PhaseYText}"
+                                   HorizontalAlignment="Right"
+                                   Margin="0,0,0,10"/>
+
+                        <TextBlock Text="Крок часу dt, с"/>
+                        <TextBox Text="{Binding Dt, UpdateSourceTrigger=PropertyChanged}"
+                                 Margin="0,5,0,15"/>
+
+                        <Button Content="Побудувати"
+                                Command="{Binding BuildCommand}"
+                                Height="38"
+                                FontWeight="Bold"
+                                Margin="0,0,0,16"/>
+
+                        <TextBlock Text="Швидкі співвідношення:"
+                                   FontWeight="Bold"
+                                   Margin="0,0,0,8"/>
+
+                        <UniformGrid Columns="2" Rows="2">
+                            <Button Content="1 : 1"
+                                    Command="{Binding PresetCommand}"
+                                    CommandParameter="1:1"
+                                    Margin="2"/>
+                            <Button Content="1 : 2"
+                                    Command="{Binding PresetCommand}"
+                                    CommandParameter="1:2"
+                                    Margin="2"/>
+                            <Button Content="2 : 3"
+                                    Command="{Binding PresetCommand}"
+                                    CommandParameter="2:3"
+                                    Margin="2"/>
+                            <Button Content="3 : 4"
+                                    Command="{Binding PresetCommand}"
+                                    CommandParameter="3:4"
+                                    Margin="2" Click="Button_Click"/>
+                        </UniformGrid>
+
+                        <Border Background="#EEF3F8"
+                                CornerRadius="6"
+                                Padding="10"
+                                Margin="0,16,0,0">
+                            <TextBlock Text="{Binding StatusMessage}"
+                                       TextWrapping="Wrap"/>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+
+            <Border Grid.Column="1"
+                    Background="White"
+                    CornerRadius="10"
+                    Padding="12">
+                <Viewbox Stretch="Uniform">
+                    <Canvas Width="800" Height="560" Background="White">
+
+                        <!-- Осі координат -->
+                        <Line X1="400" Y1="25" X2="400" Y2="535"
+                              Stroke="Gray" StrokeThickness="1"/>
+                        <Line X1="25" Y1="280" X2="775" Y2="280"
+                              Stroke="Gray" StrokeThickness="1"/>
+
+                        <!-- Підписи осей -->
+                        <TextBlock Canvas.Left="760" Canvas.Top="288"
+                                   Text="X"
+                                   FontWeight="Bold"/>
+                        <TextBlock Canvas.Left="408" Canvas.Top="25"
+                                   Text="Y"
+                                   FontWeight="Bold"/>
+
+                        <!-- Фігура Ліссажу -->
+                        <Polyline Points="{Binding CurvePoints}"
+                                  Stroke="Black"
+                                  StrokeThickness="2"
+                                  StrokeLineJoin="Round"/>
+
+                    </Canvas>
+                </Viewbox>
+            </Border>
+        </Grid>
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,12,0,0" Grid.ColumnSpan="2">
+            <TextBlock Text="Модель: "
+                       FontWeight="Bold"/>
+            <TextBlock Text="x(t) = Ax·sin(2πfx·t + φx),   y(t) = Ay·sin(2πfy·t + φy)"
+                       Margin="5,0,0,0"/>
+        </StackPanel>
+    </Grid>
+</Window>
